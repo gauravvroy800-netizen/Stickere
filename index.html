@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎨 AI Sticker Creator — Redbubble Seller Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600;700&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07070f;--s1:#0d0d1f;--s2:#131326;--s3:#1a1a35;
+  --p:#6366f1;--pp:#8b5cf6;--acc:#f59e0b;--green:#22c55e;--red:#ef4444;--pink:#ec4899;--cyan:#06b6d4;
+  --text:#f1f5ff;--muted:#4a4a7a;--border:rgba(99,102,241,0.15);
+  --grad:linear-gradient(135deg,#6366f1,#8b5cf6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 20% 10%,rgba(99,102,241,.07) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 80% 90%,rgba(139,92,246,.06) 0%,transparent 60%);
+  pointer-events:none;z-index:0}
+
+/* ── HEADER ── */
+header{background:rgba(13,13,31,.8);backdrop-filter:blur(20px);padding:16px 0;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1000}
+.hdr{max-width:1400px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:10px}
+.logo span{-webkit-text-fill-color:var(--acc)}
+.nav{display:flex;gap:6px}
+.nav a{color:rgba(255,255,255,.6);text-decoration:none;font-weight:600;font-size:.85rem;padding:7px 14px;border-radius:8px;transition:all .2s}
+.nav a:hover{background:rgba(99,102,241,.15);color:var(--text)}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:50px 20px 36px;position:relative;z-index:2}
+.h-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);padding:5px 18px;border-radius:50px;font-size:.72rem;font-weight:700;color:var(--acc);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,5vw,3.2rem);background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px;line-height:1.1}
+.hero p{color:var(--muted);font-size:.95rem;max-width:520px;margin:0 auto}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1400px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:2}
+.main-grid{display:grid;grid-template-columns:420px 1fr;gap:24px}
+
+/* ── CARD ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:26px;position:relative;overflow:hidden}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(99,102,241,.3),transparent)}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:20px;display:flex;align-items:center;gap:9px;color:var(--text)}
+.card-title .ci{font-size:1.1rem}
+
+/* ── FORM ── */
+.field{margin-bottom:18px}
+label{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;display:block;margin-bottom:7px}
+input[type=text],input[type=number],select,textarea{width:100%;padding:11px 15px;background:var(--s2);border:1.5px solid var(--s3);border-radius:11px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:rgba(99,102,241,.5)}
+select option{background:var(--s2)}
+textarea{resize:vertical;min-height:70px;line-height:1.6}
+
+/* ── CATEGORY CHIPS ── */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cchip{padding:11px 14px;background:var(--s2);border:1.5px solid var(--s3);border-radius:11px;color:var(--muted);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+.cchip:hover{border-color:rgba(99,102,241,.4);color:var(--text)}
+.cchip.on{background:rgba(99,102,241,.12);border-color:var(--p);color:var(--text)}
+
+/* ── STYLE CHIPS ── */
+.style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.schip{padding:9px;background:var(--s2);border:1.5px solid var(--s3);border-radius:10px;color:var(--muted);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.schip:hover{border-color:rgba(99,102,241,.4);color:var(--text)}
+.schip.on{background:rgba(99,102,241,.12);border-color:var(--p);color:var(--p)}
+
+/* ── COLORS ── */
+.clr-grid{display:flex;flex-wrap:wrap;gap:10px}
+.clr{width:38px;height:38px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .25s;position:relative}
+.clr:hover{transform:scale(1.12)}
+.clr.on{border-color:#fff;transform:scale(1.15)}
+.clr.on::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.7rem;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+
+/* ── CANVAS SIZE ── */
+.size-row{display:flex;gap:8px}
+.szchip{flex:1;padding:8px;background:var(--s2);border:1.5px solid var(--s3);border-radius:9px;color:var(--muted);font-size:.74rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.szchip:hover{border-color:rgba(99,102,241,.4);color:var(--text)}
+.szchip.on{background:rgba(99,102,241,.12);border-color:var(--p);color:var(--p)}
+
+/* ── BUTTONS ── */
+.big-btn{width:100%;padding:15px;border:none;border-radius:13px;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:9px}
+.btn-grad{background:var(--grad);color:#fff;box-shadow:0 6px 20px rgba(99,102,241,.3)}
+.btn-grad:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 30px rgba(99,102,241,.45)}
+.btn-grad:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-dark{background:rgba(255,255,255,.07);color:var(--text);border:1.5px solid rgba(255,255,255,.12)}
+.btn-dark:hover:not(:disabled){background:rgba(255,255,255,.12)}
+.btn-dark:disabled{opacity:.4;cursor:not-allowed}
+.btn-acc{background:linear-gradient(135deg,var(--acc),#d97706);color:#000}
+.btn-acc:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 28px rgba(245,158,11,.35)}
+.btn-acc:disabled{opacity:.4;cursor:not-allowed}
+.btn-green{background:linear-gradient(135deg,var(--green),#16a34a);color:#fff}
+.btn-green:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 28px rgba(34,197,94,.3)}
+.spin{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.25);border-top-color:currentColor;border-radius:50%;animation:rot .7s linear infinite;display:none}
+@keyframes rot{to{transform:rotate(360deg)}}
+.ld .spin{display:block}
+.ld .blbl{display:none}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+/* ── CANVAS AREA ── */
+.canvas-wrap{display:flex;flex-direction:column;gap:20px}
+.canvas-box{background:var(--s2);border:1px solid var(--s3);border-radius:16px;padding:20px;display:flex;flex-direction:column;align-items:center;min-height:380px;justify-content:center;position:relative}
+canvas{border-radius:12px;max-width:100%;transition:transform .2s}
+canvas:hover{transform:scale(1.01)}
+.no-sticker{text-align:center;color:var(--muted)}
+.no-sticker .ns-icon{font-size:3.5rem;margin-bottom:12px;opacity:.4}
+.no-sticker p{font-size:.85rem}
+
+/* ── TABS ── */
+.ptabs{display:flex;gap:0;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:3px;margin-bottom:18px}
+.ptab{flex:1;padding:8px;border-radius:9px;border:none;background:none;font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;text-align:center}
+.ptab.on{background:var(--s3);color:var(--p);box-shadow:inset 0 0 0 1px rgba(99,102,241,.25)}
+
+/* ── PROMPT OUTPUT ── */
+.out-section{display:none}
+.out-section.vis{display:block}
+.out-box{background:var(--s2);border:1px solid var(--s3);border-radius:12px;padding:16px;position:relative;margin-bottom:12px}
+.out-lbl{font-size:.63rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.tag{padding:2px 8px;border-radius:4px;font-size:.58rem;font-weight:700}
+.tp{background:rgba(99,102,241,.15);color:var(--p)}
+.ta{background:rgba(245,158,11,.15);color:var(--acc)}
+.tg{background:rgba(34,197,94,.15);color:var(--green)}
+.tr{background:rgba(239,68,68,.15);color:var(--red)}
+.tc{background:rgba(6,182,212,.15);color:var(--cyan)}
+.out-text{font-family:'DM Mono',monospace;font-size:.76rem;color:#b8c8ff;line-height:1.8;white-space:pre-wrap;word-break:break-word;max-height:180px;overflow-y:auto}
+.cpbtn{position:absolute;top:12px;right:12px;padding:5px 12px;border-radius:7px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);color:var(--p);font-size:.68rem;font-weight:600;cursor:pointer;transition:all .2s}
+.cpbtn:hover{background:rgba(99,102,241,.2)}
+.cpbtn.ok{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:var(--green)}
+
+/* ── REDBUBBLE PACK ── */
+.rb-sizes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.rb-sz{background:var(--s2);border:1px solid var(--s3);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s}
+.rb-sz:hover{border-color:rgba(99,102,241,.35)}
+.rb-sz.on{border-color:var(--p);background:rgba(99,102,241,.08)}
+.rb-sz .sz-label{font-weight:700;font-size:.85rem;color:var(--text)}
+.rb-sz .sz-info{font-size:.65rem;color:var(--muted);margin-top:2px}
+
+/* ── MOCKUP GRID ── */
+.mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mock-item{background:var(--s2);border:1.5px solid var(--s3);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.mock-item:hover{border-color:rgba(99,102,241,.4);transform:translateY(-2px)}
+.mock-item.on{border-color:var(--acc);background:rgba(245,158,11,.07)}
+.mock-icon{font-size:1.8rem;margin-bottom:6px}
+.mock-lbl{font-size:.72rem;color:var(--muted);font-weight:600}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--s1);border:1px solid var(--p);color:var(--p);padding:10px 22px;border-radius:50px;font-size:.82rem;font-weight:600;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 6px 24px rgba(99,102,241,.2);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── LOADING OVERLAY ── */
+.loverlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9998;flex-direction:column;gap:18px}
+.loverlay.on{display:flex}
+.lspinner{width:54px;height:54px;border:4px solid rgba(99,102,241,.15);border-top-color:var(--p);border-radius:50%;animation:rot .8s linear infinite}
+.ltxt{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--p)}
+.lstep{font-size:.8rem;color:var(--muted);margin-top:4px}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:2px}
+
+@media(max-width:960px){.main-grid{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .cat-grid{grid-template-columns:1fr}
+  .style-grid{grid-template-columns:repeat(2,1fr)}
+  .rb-sizes{grid-template-columns:repeat(2,1fr)}
+  .mock-grid{grid-template-columns:repeat(2,1fr)}
+  .btn-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="logo">🎨 <span>Sticker</span>AI <span style="-webkit-text-fill-color:rgba(255,255,255,.3);font-size:.9rem;font-weight:400">for Redbubble</span></div>
+    <nav class="nav">
+      <a href="#">Creator</a>
+      <a href="#">Bulk Pack</a>
+      <a href="#">SEO Tool</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="h-badge">✨ Redbubble Seller Automation</div>
+  <h1>AI Sticker Creator<br>+ Seller Pack</h1>
+  <p>Ek click mein sticker design + Midjourney prompt + Redbubble SEO title/tags ready</p>
+</div>
+
+<div class="wrap">
+<div class="main-grid">
+
+  <!-- ── LEFT PANEL ── -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+
+    <!-- CATEGORY -->
+    <div class="card">
+      <div class="card-title"><span class="ci">🗂️</span> Category</div>
+      <div class="cat-grid">
+        <div class="cchip on" data-val="Cute Animal" onclick="setC(this)">🐱 Cute Animal</div>
+        <div class="cchip" data-val="Aesthetic Floral" onclick="setC(this)">🌸 Aesthetic Floral</div>
+        <div class="cchip" data-val="Gaming Character" onclick="setC(this)">🎮 Gaming</div>
+        <div class="cchip" data-val="Motivational Quote" onclick="setC(this)">💪 Motivational</div>
+        <div class="cchip" data-val="Anime Character" onclick="setC(this)">⛩️ Anime</div>
+        <div class="cchip" data-val="Nature Landscape" onclick="setC(this)">🌿 Nature</div>
+        <div class="cchip" data-val="Funny Meme" onclick="setC(this)">😂 Funny Meme</div>
+        <div class="cchip" data-val="Space Galaxy" onclick="setC(this)">🚀 Space</div>
+        <div class="cchip" data-val="Food Illustration" onclick="setC(this)">🍕 Food</div>
+        <div class="cchip" data-val="Y2K Aesthetic" onclick="setC(this)">💿 Y2K</div>
+        <div class="cchip" data-val="Cottagecore" onclick="setC(this)">🍄 Cottagecore</div>
+        <div class="cchip" data-val="Custom" onclick="setC(this)">✏️ Custom</div>
+      </div>
+    </div>
+
+    <!-- DETAILS -->
+    <div class="card">
+      <div class="card-title"><span class="ci">✍️</span> Sticker Details</div>
+
+      <div class="field" id="customField" style="display:none">
+        <label>Custom Topic / Idea</label>
+        <input type="text" id="customTopic" placeholder="e.g. cute dragon reading a book...">
+      </div>
+
+      <div class="field">
+        <label>Text on Sticker (optional)</label>
+        <input type="text" id="stickerText" placeholder='e.g. "Stay Weird" or leave empty for no text'>
+      </div>
+
+      <div class="field">
+        <label>Art Style</label>
+        <div class="style-grid">
+          <div class="schip on" data-val="Kawaii cute cartoon" onclick="setSt(this)">🌸 Kawaii</div>
+          <div class="schip" data-val="Bold flat vector" onclick="setSt(this)">⬛ Flat Vector</div>
+          <div class="schip" data-val="Watercolor illustrated" onclick="setSt(this)">🎨 Watercolor</div>
+          <div class="schip" data-val="Retro vintage 70s" onclick="setSt(this)">📼 Retro</div>
+          <div class="schip" data-val="Chibi anime" onclick="setSt(this)">⛩️ Chibi</div>
+          <div class="schip" data-val="Line art minimal" onclick="setSt(this)">✏️ Line Art</div>
+          <div class="schip" data-val="Psychedelic groovy" onclick="setSt(this)">🌀 Psychedelic</div>
+          <div class="schip" data-val="Cottagecore soft" onclick="setSt(this)">🍄 Cottagecore</div>
+          <div class="schip" data-val="Y2K holographic" onclick="setSt(this)">💿 Y2K</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Background Color</label>
+        <div class="clr-grid">
+          <div class="clr on" style="background:#ffffff" data-hex="#ffffff" onclick="setClr(this)" title="White"></div>
+          <div class="clr" style="background:#fde68a" data-hex="#fde68a" onclick="setClr(this)" title="Yellow"></div>
+          <div class="clr" style="background:#fbcfe8" data-hex="#fbcfe8" onclick="setClr(this)" title="Pink"></div>
+          <div class="clr" style="background:#bfdbfe" data-hex="#bfdbfe" onclick="setClr(this)" title="Blue"></div>
+          <div class="clr" style="background:#bbf7d0" data-hex="#bbf7d0" onclick="setClr(this)" title="Mint"></div>
+          <div class="clr" style="background:#ddd6fe" data-hex="#ddd6fe" onclick="setClr(this)" title="Lavender"></div>
+          <div class="clr" style="background:#fed7aa" data-hex="#fed7aa" onclick="setClr(this)" title="Peach"></div>
+          <div class="clr" style="background:#1a1a35;border:1px solid #333" data-hex="#1a1a35" onclick="setClr(this)" title="Dark"></div>
+          <div class="clr" style="background:linear-gradient(135deg,#f9a8d4,#818cf8)" data-hex="gradient_pastel" onclick="setClr(this)" title="Gradient"></div>
+          <div class="clr" style="background:transparent;border:2px dashed #4a4a7a" data-hex="transparent" onclick="setClr(this)" title="Transparent">🚫</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Canvas Size (Download Quality)</label>
+        <div class="size-row" style="flex-wrap:wrap;gap:8px">
+          <div class="szchip" data-sz="800" onclick="setSz(this)">800px</div>
+          <div class="szchip on" data-sz="1000" onclick="setSz(this)">1000px</div>
+          <div class="szchip" data-sz="2000" onclick="setSz(this)">2000px</div>
+          <div class="szchip" data-sz="3000" onclick="setSz(this)">3000px</div>
+          <div class="szchip" data-sz="4000" onclick="setSz(this)">4000px <span style="color:var(--acc);font-size:.68em;font-weight:700">BEST</span></div>
+        </div>
+        <p style="font-size:.68rem;color:var(--muted);margin-top:6px">⚡ Preview always 400px — download mein full size milti hai</p>
+      </div>
+
+      <div class="field">
+        <label>Extra Details (optional)</label>
+        <textarea id="extraDetails" placeholder="e.g. pastel colors, mushroom hat, winking face, white outline border..."></textarea>
+      </div>
+
+      <button class="big-btn btn-grad" id="genBtn" onclick="generateAll()">
+        <div class="spin"></div>
+        <span class="blbl">🚀 Generate Sticker + Redbubble Pack</span>
+      </button>
+
+      <div class="btn-row">
+        <button class="big-btn btn-dark" onclick="downloadPNG()" id="dlBtn" disabled>
+          <span class="blbl">⬇️ Download PNG</span>
+        </button>
+        <button class="big-btn btn-acc" onclick="downloadAll()" id="dlAllBtn" disabled>
+          <span class="blbl">📦 Download Pack</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- REDBUBBLE SIZES -->
+    <div class="card">
+      <div class="card-title"><span class="ci">📐</span> Redbubble Size Guide — Click to Select</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Card pe click karo → size auto-select ho jaayegi:</p>
+      <div class="rb-sizes">
+        <div class="rb-sz" onclick="setRbSize(this,1000)" data-rbsz="1000"><div class="sz-label">1000×1000</div><div class="sz-info">Sticker (min)</div></div>
+        <div class="rb-sz" onclick="setRbSize(this,2000)" data-rbsz="2000"><div class="sz-label">2000×2000</div><div class="sz-info">Sticker (best)</div></div>
+        <div class="rb-sz" onclick="setRbSize(this,3000)" data-rbsz="3000"><div class="sz-label">3000×3000</div><div class="sz-info">Print quality</div></div>
+        <div class="rb-sz" onclick="setRbSize(this,4000)" data-rbsz="4000"><div class="sz-label">4000×4000</div><div class="sz-info">Poster grade ⭐</div></div>
+      </div>
+      <p style="font-size:.72rem;color:var(--muted);margin-top:10px">⚠️ Always upload at 150+ DPI. PNG transparent background preferred.</p>
+    </div>
+
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="canvas-wrap">
+
+    <!-- PREVIEW -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div class="card-title" style="margin-bottom:0"><span class="ci">🖼️</span> Sticker Preview</div>
+        <div style="font-size:.75rem;color:var(--muted)" id="canvasSizeLabel">1000 × 1000 px</div>
+      </div>
+      <div class="canvas-box" id="canvasBox">
+        <div class="no-sticker" id="noSticker">
+          <div class="ns-icon">🎨</div>
+          <p>Topic select karo + Generate click karo<br>Preview yahan aayega</p>
+        </div>
+        <canvas id="stickerCanvas" style="display:none"></canvas>
+      </div>
+
+      <!-- MOCKUPS -->
+      <div style="margin-top:20px">
+        <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Mockup Preview</div>
+        <div class="mock-grid">
+          <div class="mock-item on" onclick="setMock(this,'laptop')"><div class="mock-icon">💻</div><div class="mock-lbl">Laptop</div></div>
+          <div class="mock-item" onclick="setMock(this,'bottle')"><div class="mock-icon">🍶</div><div class="mock-lbl">Water Bottle</div></div>
+          <div class="mock-item" onclick="setMock(this,'phone')"><div class="mock-icon">📱</div><div class="mock-lbl">Phone Case</div></div>
+          <div class="mock-item" onclick="setMock(this,'notebook')"><div class="mock-icon">📓</div><div class="mock-lbl">Notebook</div></div>
+          <div class="mock-item" onclick="setMock(this,'window')"><div class="mock-icon">🪟</div><div class="mock-lbl">Window</div></div>
+          <div class="mock-item" onclick="setMock(this,'bag')"><div class="mock-icon">🎒</div><div class="mock-lbl">Bag</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERATED CONTENT TABS -->
+    <div class="card" id="aiBox" style="display:none">
+      <div class="card-title"><span class="ci">🤖</span> AI Generated Content</div>
+
+      <div class="ptabs">
+        <button class="ptab on" onclick="showPTab('pt-prompt',this)">🖼️ MJ Prompt</button>
+        <button class="ptab" onclick="showPTab('pt-rb',this)">🛒 Redbubble</button>
+        <button class="ptab" onclick="showPTab('pt-seo',this)">🔍 SEO Tags</button>
+        <button class="ptab" onclick="showPTab('pt-py',this)">🐍 Python</button>
+      </div>
+
+      <!-- MIDJOURNEY PROMPTS -->
+      <div class="out-section vis" id="pt-prompt">
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag tp">Midjourney</span> Main Sticker Prompt</div>
+          <div class="out-text" id="mj-main">—</div>
+          <button class="cpbtn" onclick="cp('mj-main',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag tp">Midjourney</span> Variation Prompt</div>
+          <div class="out-text" id="mj-var">—</div>
+          <button class="cpbtn" onclick="cp('mj-var',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag tc">DALL-E 3</span> Alternative Prompt</div>
+          <div class="out-text" id="dalle-p">—</div>
+          <button class="cpbtn" onclick="cp('dalle-p',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag tg">Stable Diffusion</span> SD Prompt</div>
+          <div class="out-text" id="sd-p">—</div>
+          <button class="cpbtn" onclick="cp('sd-p',this)">Copy</button>
+        </div>
+      </div>
+
+      <!-- REDBUBBLE METADATA -->
+      <div class="out-section" id="pt-rb">
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag ta">Redbubble</span> Title (Viral SEO)</div>
+          <div class="out-text" id="rb-title">—</div>
+          <button class="cpbtn" onclick="cp('rb-title',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag ta">Redbubble</span> Description (200 words)</div>
+          <div class="out-text" id="rb-desc">—</div>
+          <button class="cpbtn" onclick="cp('rb-desc',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag ta">Redbubble</span> 15 Tags (comma separated)</div>
+          <div class="out-text" id="rb-tags">—</div>
+          <button class="cpbtn" onclick="cp('rb-tags',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag tr">Pricing</span> Suggested Price + Strategy</div>
+          <div class="out-text" id="rb-price">—</div>
+        </div>
+      </div>
+
+      <!-- SEO -->
+      <div class="out-section" id="pt-seo">
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag tg">SEO</span> Pinterest Description</div>
+          <div class="out-text" id="seo-pin">—</div>
+          <button class="cpbtn" onclick="cp('seo-pin',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag tg">SEO</span> Instagram Caption + Hashtags</div>
+          <div class="out-text" id="seo-ig">—</div>
+          <button class="cpbtn" onclick="cp('seo-ig',this)">Copy</button>
+        </div>
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag tg">SEO</span> Niche Analysis + Competition</div>
+          <div class="out-text" id="seo-niche">—</div>
+          <button class="cpbtn" onclick="cp('seo-niche',this)">Copy</button>
+        </div>
+      </div>
+
+      <!-- PYTHON SCRIPT -->
+      <div class="out-section" id="pt-py">
+        <div class="out-box">
+          <div class="out-lbl"><span class="tag tp">Python</span> Full Automation Script</div>
+          <div class="out-text" id="py-code" style="max-height:400px">—</div>
+          <button class="cpbtn" onclick="cp('py-code',this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="big-btn btn-green" onclick="copyAllContent()">📋 Copy All Content</button>
+        <button class="big-btn btn-acc" onclick="downloadTxt()">💾 Download .txt</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loverlay" id="loverlay">
+  <div class="lspinner"></div>
+  <div class="ltxt">Generating...</div>
+  <div class="lstep" id="lstep">AI content prepare ho raha hai</div>
+</div>
+
+<div class="toast" id="toast">✅ Done!</div>
+
+<script>
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let selCategory = 'Cute Animal';
+let selStyle = 'Kawaii cute cartoon';
+let selColor = '#ffffff';
+let selSize = 1000;
+let selMock = 'laptop';
+let aiData = {};
+
+// ══════════════════════════════════
+// CHIP SELECTORS
+// ══════════════════════════════════
+function setC(el) {
+  document.querySelectorAll('.cchip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  selCategory = el.dataset.val;
+  document.getElementById('customField').style.display = selCategory === 'Custom' ? 'block' : 'none';
+}
+function setSt(el) {
+  document.querySelectorAll('.schip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  selStyle = el.dataset.val;
+}
+function setClr(el) {
+  document.querySelectorAll('.clr').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  selColor = el.dataset.hex;
+}
+function setSz(el) {
+  document.querySelectorAll('.szchip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  selSize = parseInt(el.dataset.sz);
+  document.getElementById('canvasSizeLabel').textContent = `${selSize} × ${selSize} px`;
+  // rb-sz cards bhi sync karo
+  document.querySelectorAll('.rb-sz').forEach(c => {
+    c.classList.toggle('on', parseInt(c.dataset.rbsz) === selSize);
+  });
+  showToast(`📐 Size set: ${selSize}×${selSize}px`);
+}
+
+function setRbSize(el, size) {
+  // rb-sz cards
+  document.querySelectorAll('.rb-sz').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  selSize = size;
+  document.getElementById('canvasSizeLabel').textContent = `${selSize} × ${selSize} px`;
+  // szchip bhi sync karo
+  document.querySelectorAll('.szchip').forEach(c => {
+    c.classList.toggle('on', parseInt(c.dataset.sz) === selSize);
+  });
+  showToast(`📐 ${selSize}×${selSize}px select hua! Download mein ye size milegi ✅`);
+}
+function setMock(el, val) {
+  document.querySelectorAll('.mock-item').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  selMock = val;
+}
+function showPTab(id, btn) {
+  document.querySelectorAll('.out-section').forEach(p => p.classList.remove('vis'));
+  document.getElementById(id).classList.add('vis');
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ══════════════════════════════════
+// MAIN GENERATE
+// ══════════════════════════════════
+async function generateAll() {
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.classList.add('ld');
+
+  const topic = selCategory === 'Custom'
+    ? (document.getElementById('customTopic').value || 'Cute custom sticker')
+    : selCategory;
+  const text = document.getElementById('stickerText').value.trim();
+  const extra = document.getElementById('extraDetails').value.trim();
+
+  showOverlay('AI content generate ho raha hai...');
+
+  try {
+    updateOverlay('🤖 Claude se prompts manga raha hoon...');
+    aiData = await callClaude(topic, selStyle, text, extra, selColor);
+  } catch(e) {
+    aiData = generateFallback(topic, selStyle, text, extra);
+  }
+
+  updateOverlay('🎨 Canvas pe sticker bana raha hoon...');
+  await sleep(400);
+  drawSticker(topic, text, selStyle, selColor, selSize);
+
+  updateOverlay('📦 Redbubble pack ready ho raha hai...');
+  await sleep(300);
+  fillUI(aiData, topic);
+
+  hideOverlay();
+  document.getElementById('aiBox').style.display = 'block';
+  document.getElementById('dlBtn').disabled = false;
+  document.getElementById('dlAllBtn').disabled = false;
+  btn.disabled = false;
+  btn.classList.remove('ld');
+  showToast('✅ Sticker + Redbubble pack ready!');
+  document.getElementById('aiBox').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ══════════════════════════════════
+// CLAUDE API
+// ══════════════════════════════════
+async function callClaude(topic, style, text, extra, color) {
+  const textNote = text ? `Text on sticker: "${text}"` : 'No text — illustration only';
+  const prompt = `You are an expert Redbubble sticker seller and Midjourney prompt engineer.
+Create a complete seller pack for this sticker:
+
+TOPIC: ${topic}
+ART STYLE: ${style}
+${textNote}
+EXTRA: ${extra || 'none'}
+BACKGROUND: ${color}
+
+Return ONLY valid JSON (no markdown):
+{
+  "mjMain": "Full detailed Midjourney v6 prompt. Include: style, subject, colors, lighting, --style raw --v 6 --ar 1:1 --no background --q 2",
+  "mjVar": "Alternative Midjourney prompt with slight variation for B/W or different colors",
+  "dalle": "DALL-E 3 optimized prompt for sticker, transparent background, high detail",
+  "sd": "Stable Diffusion prompt with negative prompt: (negative prompt: background, blurry, low quality)",
+  "rbTitle": "Redbubble SEO title under 80 chars — includes main keyword, style, use-case",
+  "rbDesc": "Redbubble description 150-200 words: what it is, who it's for, style, uses, where to put it, call to action",
+  "rbTags": "15 Redbubble tags comma-separated: mix niche + broad, trending sticker keywords",
+  "pricing": "Suggested Redbubble markup % and reasoning. Include: base price, recommended markup, expected profit per sale, volume strategy",
+  "pinDesc": "Pinterest pin description 100 words with keywords for sticker buyers",
+  "igCaption": "Instagram caption with emojis, 150 words, sticker seller vibe, 20 hashtags",
+  "nicheAnalysis": "Quick niche analysis: competition level (low/medium/high), trending score, best seasons to sell, similar successful sellers style tips"
+}`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2500,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const d = await res.json();
+  const raw = d.content?.[0]?.text || '{}';
+  return JSON.parse(raw.replace(/```json|```/g, '').trim());
+}
+
+// ══════════════════════════════════
+// FALLBACK
+// ══════════════════════════════════
+function generateFallback(topic, style, text, extra) {
+  const t = topic;
+  return {
+    mjMain: `/imagine ${style} sticker of ${t}${text ? `, text "${text}"` : ''}, white outline border, bold colors, cute character, transparent background, centered composition, high detail, sticker design, --style raw --v 6 --ar 1:1 --no background shadow --q 2`,
+    mjVar: `/imagine ${style} sticker of ${t} in pastel color palette, soft shadows, clean lines, minimal background, kawaii style, die-cut sticker ready, --style raw --v 6 --ar 1:1 --q 2`,
+    dalle: `A cute ${style} style sticker design featuring ${t}${text ? ` with text "${text}"` : ''}. White thick outline border, vibrant colors, transparent background, centered on canvas, high resolution sticker art, no background, die-cut ready.`,
+    sd: `${style} sticker of ${t}, white outline, sticker design, flat colors, bold lines, centered, high detail, cute (negative prompt: background, blurry, realistic, photo, shadow, noise, low quality)`,
+    rbTitle: `${topic} ${style} Sticker — Cute Die-Cut for Laptop & Bottle`,
+    rbDesc: `Perfect ${t} sticker in adorable ${style} art style! 🎨\n\nThis high-quality die-cut sticker is perfect for:\n• Laptops & MacBooks\n• Water bottles & tumblers\n• Phone cases & covers\n• Notebooks & planners\n• Windows & car bumpers\n\nFeatures:\n✅ Weather resistant vinyl\n✅ UV protected colors\n✅ Easy to apply & remove\n✅ Dishwasher safe\n\nMade by Redbubble's printing partners with premium materials. Each sticker is individually cut to shape.\n\nPerfect gift for ${t} lovers! Order yours today! 🛒`,
+    rbTags: `${t.toLowerCase()} sticker, cute sticker, ${style.toLowerCase()} sticker, laptop sticker, aesthetic sticker, kawaii sticker, vinyl sticker, die cut sticker, water bottle sticker, tumbler sticker, sticker pack, cute art, illustration, gift sticker, redbubble sticker`,
+    pricing: `Base Price: ~$2.20\nRecommended Markup: 35-40%\nYour Profit: ~$0.77-0.88 per sticker\nStrategy: Volume selling — aim for 10+ designs in same niche. Bundle promotions increase AOV. Price at $2.99-3.49 for competitive edge.`,
+    pinDesc: `Love cute ${t} art? This adorable ${style} style sticker is perfect for decorating your laptop, water bottle, or notebook! Shop this unique die-cut sticker on Redbubble. Perfect for gifting, room decor lovers, and sticker collectors. Click to see more cute sticker designs! ✨`,
+    igCaption: `New sticker just dropped! 🎉✨\n\nThis adorable ${t} sticker in ${style} style is now live on Redbubble! Perfect for your laptop, water bottle, or anywhere you want to add some magic ✨\n\nLink in bio to shop!\n\n#sticker #stickerdesign #redbubble #cutesticker #${t.replace(/ /g,'').toLowerCase()} #kawaii #stickerpack #laptopsticker #aesthetic #smallshop #digitalart #illustration #stickerart #handmade #giftsforher`,
+    nicheAnalysis: `Competition: Medium\nTrend Score: 7/10\nBest Seasons: Year-round, peaks during back-to-school (Aug-Sep) and holidays (Nov-Dec)\nTips: Add seasonal variants (Christmas, Halloween versions sell 3x more). Use "${topic} gift" in title for gift buyers. Matching color palettes across your shop increase repeat purchases.`
+  };
+}
+
+// ══════════════════════════════════
+// FILL UI
+// ══════════════════════════════════
+function fillUI(d, topic) {
+  setText('mj-main', d.mjMain);
+  setText('mj-var', d.mjVar);
+  setText('dalle-p', d.dalle);
+  setText('sd-p', d.sd);
+  setText('rb-title', d.rbTitle);
+  setText('rb-desc', d.rbDesc);
+  setText('rb-tags', d.rbTags);
+  setText('rb-price', d.pricing);
+  setText('seo-pin', d.pinDesc);
+  setText('seo-ig', d.igCaption);
+  setText('seo-niche', d.nicheAnalysis);
+
+  // Python script
+  const pyScript = buildPy(d, topic);
+  setText('py-code', pyScript);
+}
+function setText(id, t) { const el = document.getElementById(id); if (el) el.textContent = t || '—'; }
+
+// ══════════════════════════════════
+// DRAW STICKER ON CANVAS
+// ══════════════════════════════════
+function drawSticker(topic, text, style, color, size) {
+  const cnv = document.getElementById('stickerCanvas');
+  const ctx = cnv.getContext('2d');
+  const previewSize = Math.min(400, window.innerWidth - 80);
+  cnv.width = previewSize;
+  cnv.height = previewSize;
+
+  // Style map
+  const themes = {
+    'Kawaii cute cartoon':{ emojis:['🌸','🌟','💫','🎀','✨'], accent:'#ff9de2' },
+    'Bold flat vector':{ emojis:['⬛','🔷','🔶','🔺','◼️'], accent:'#333' },
+    'Watercolor illustrated':{ emojis:['🌊','🌈','☁️','🌺','🍃'], accent:'#7dd3fc' },
+    'Retro vintage 70s':{ emojis:['📼','🌻','☮️','🚐','🍄'], accent:'#d97706' },
+    'Chibi anime':{ emojis:['⛩️','🌙','🔮','🌸','✨'], accent:'#c084fc' },
+    'Line art minimal':{ emojis:['✏️','⬜','📐','🖊️','〽️'], accent:'#94a3b8' },
+    'Psychedelic groovy':{ emojis:['🌀','🔮','🌈','💜','🦋'], accent:'#a855f7' },
+    'Cottagecore soft':{ emojis:['🍄','🌿','🌻','🐝','🍃'], accent:'#86efac' },
+    'Y2K holographic':{ emojis:['💿','⭐','💎','✨','🌀'], accent:'#818cf8' }
+  };
+  const theme = themes[style] || themes['Kawaii cute cartoon'];
+  const s = previewSize;
+  const pad = s * 0.05;
+  const r = s * 0.5 - pad;
+  const cx = s / 2, cy = s / 2;
+
+  ctx.clearRect(0, 0, s, s);
+
+  // Outer white border (die-cut look)
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.25)';
+  ctx.shadowBlur = s * 0.04;
+  ctx.shadowOffsetY = s * 0.015;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r + s * 0.03, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.restore();
+
+  // Background
+  if (color === 'transparent') {
+    ctx.clearRect(0, 0, s, s);
+  } else if (color === 'gradient_pastel') {
+    const grd = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+    grd.addColorStop(0, '#fda4af');
+    grd.addColorStop(0.5, '#c4b5fd');
+    grd.addColorStop(1, '#93c5fd');
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = grd; ctx.fill();
+  } else {
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+  }
+
+  // Decorative dots ring
+  for (let i = 0; i < 12; i++) {
+    const angle = (i / 12) * Math.PI * 2;
+    const dx = cx + Math.cos(angle) * r * 0.85;
+    const dy = cy + Math.sin(angle) * r * 0.85;
+    ctx.beginPath(); ctx.arc(dx, dy, s * 0.012, 0, Math.PI * 2);
+    ctx.fillStyle = theme.accent + '60'; ctx.fill();
+  }
+
+  // Category icon (big emoji)
+  const iconMap = {
+    'Cute Animal':'🐱', 'Aesthetic Floral':'🌸', 'Gaming Character':'🎮',
+    'Motivational Quote':'💪', 'Anime Character':'⛩️', 'Nature Landscape':'🌿',
+    'Funny Meme':'😂', 'Space Galaxy':'🚀', 'Food Illustration':'🍕',
+    'Y2K Aesthetic':'💿', 'Cottagecore':'🍄', 'Custom':'🎨'
+  };
+  const mainEmoji = iconMap[topic] || '🎨';
+  ctx.font = `${s * 0.28}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(mainEmoji, cx, text ? cy - s * 0.08 : cy);
+
+  // Scattered small emojis
+  const smallEmojis = theme.emojis;
+  const positions = [
+    [cx - r*0.55, cy - r*0.55], [cx + r*0.52, cy - r*0.5],
+    [cx - r*0.5, cy + r*0.5], [cx + r*0.5, cy + r*0.48]
+  ];
+  positions.forEach(([x,y], i) => {
+    ctx.font = `${s * 0.07}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(smallEmojis[i % smallEmojis.length], x, y);
+  });
+
+  // Sticker text
+  if (text) {
+    const fontSize = Math.max(s * 0.065, 14);
+    ctx.font = `bold ${fontSize}px 'Outfit', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // Text outline
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = s * 0.012;
+    ctx.lineJoin = 'round';
+    ctx.strokeText(text, cx, cy + r * 0.5);
+    ctx.fillStyle = '#1a1a35';
+    ctx.fillText(text, cx, cy + r * 0.5);
+  }
+
+  // Clip to circle
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-in';
+  ctx.beginPath();
+  ctx.arc(cx, cy, r + s * 0.02, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  document.getElementById('noSticker').style.display = 'none';
+  cnv.style.display = 'block';
+}
+
+// ══════════════════════════════════
+// PYTHON SCRIPT
+// ══════════════════════════════════
+function buildPy(d, topic) {
+  return `#!/usr/bin/env python3
+"""
+🎨 AI Sticker Automation — Redbubble Seller Tool
+Topic: ${topic}
+Auto-generates prompts, saves files, ready for API integration
+"""
+
+import os, json, requests, anthropic
+
+CLAUDE_KEY = os.getenv("CLAUDE_API_KEY", "your_key_here")
+TOPIC      = "${topic}"
+STYLE      = "${selStyle}"
+OUTPUT_DIR = "sticker_output"
+
+# ── SECTION 1: Generate with Claude ──────────────────
+def generate_sticker_pack(topic, style, text="", extra=""):
+    client = anthropic.Anthropic(api_key=CLAUDE_KEY)
+    prompt = f"""Create Redbubble sticker pack for:
+Topic: {topic}, Style: {style}, Text: {text or 'none'}
+Return JSON: mjMain, mjVar, dalle, sd, rbTitle, rbDesc, rbTags, pricing"""
+    msg = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=2000,
+        messages=[{"role":"user","content":prompt}]
+    )
+    raw = msg.content[0].text.strip().replace("\`\`\`json","").replace("\`\`\`","")
+    return json.loads(raw)
+
+# ── SECTION 2: Save all content ──────────────────────
+def save_pack(data, topic):
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    with open(f"{OUTPUT_DIR}/midjourney_prompts.txt","w") as f:
+        f.write(f"MAIN PROMPT:\\n{data.get('mjMain','')}\\n\\n")
+        f.write(f"VARIATION:\\n{data.get('mjVar','')}\\n\\n")
+        f.write(f"DALLE-3:\\n{data.get('dalle','')}\\n\\n")
+        f.write(f"STABLE DIFFUSION:\\n{data.get('sd','')}")
+
+    with open(f"{OUTPUT_DIR}/redbubble_listing.txt","w") as f:
+        f.write(f"TITLE:\\n{data.get('rbTitle','')}\\n\\n")
+        f.write(f"DESCRIPTION:\\n{data.get('rbDesc','')}\\n\\n")
+        f.write(f"TAGS:\\n{data.get('rbTags','')}")
+
+    with open(f"{OUTPUT_DIR}/seo_social.txt","w") as f:
+        f.write(f"PINTEREST:\\n{data.get('pinDesc','')}\\n\\n")
+        f.write(f"INSTAGRAM:\\n{data.get('igCaption','')}\\n\\n")
+        f.write(f"NICHE ANALYSIS:\\n{data.get('nicheAnalysis','')}")
+
+    print(f"✅ Saved to /{OUTPUT_DIR}/")
+
+# ── SECTION 3: Bulk generation ───────────────────────
+def bulk_generate(topics_list):
+    """Generate packs for multiple topics at once"""
+    results = []
+    for topic in topics_list:
+        print(f"Generating: {topic}...")
+        data = generate_sticker_pack(topic, STYLE)
+        save_pack(data, topic)
+        results.append({"topic": topic, "title": data.get("rbTitle","")})
+    return results
+
+# ── MAIN ─────────────────────────────────────────────
+if __name__ == "__main__":
+    print("🎨 Sticker Pack Generator Starting...")
+    data = generate_sticker_pack(TOPIC, STYLE)
+    save_pack(data, TOPIC)
+    print(f"\\nTitle: {data.get('rbTitle','')}")
+    print(f"Tags: {data.get('rbTags','')[:80]}...")
+    print("\\n🚀 Done! Check /sticker_output/ folder")`;
+}
+
+// ══════════════════════════════════
+// DOWNLOAD
+// ══════════════════════════════════
+function downloadPNG() {
+  const cnv = document.getElementById('stickerCanvas');
+  if (cnv.style.display === 'none') { showToast('⚠️ Pehle generate karo'); return; }
+
+  // Redraw at full res
+  const fullCnv = document.createElement('canvas');
+  fullCnv.width = selSize;
+  fullCnv.height = selSize;
+  const ctx = fullCnv.getContext('2d');
+  ctx.drawImage(cnv, 0, 0, selSize, selSize);
+
+  const a = document.createElement('a');
+  a.href = fullCnv.toDataURL('image/png');
+  a.download = `sticker-${selCategory.replace(/ /g,'-')}-${selSize}px.png`;
+  a.click();
+  showToast('⬇️ PNG downloaded!');
+}
+
+function downloadTxt() {
+  if (!aiData.mjMain) { showToast('⚠️ Pehle generate karo'); return; }
+  let content = `🎨 STICKER SELLER PACK\n${'='.repeat(50)}\nTopic: ${selCategory} | Style: ${selStyle}\n\n`;
+  const sections = [
+    ['Midjourney Main', aiData.mjMain], ['Midjourney Variation', aiData.mjVar],
+    ['DALL-E 3', aiData.dalle], ['Stable Diffusion', aiData.sd],
+    ['Redbubble Title', aiData.rbTitle], ['Redbubble Description', aiData.rbDesc],
+    ['Redbubble Tags', aiData.rbTags], ['Pricing Strategy', aiData.pricing],
+    ['Pinterest', aiData.pinDesc], ['Instagram', aiData.igCaption],
+    ['Niche Analysis', aiData.nicheAnalysis], ['Python Script', document.getElementById('py-code').textContent]
+  ];
+  sections.forEach(([label, val]) => {
+    content += `\n${'═'.repeat(40)}\n${label}\n${'═'.repeat(40)}\n${val||'—'}\n`;
+  });
+  const blob = new Blob([content], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `sticker-pack-${selCategory.replace(/ /g,'-')}-${Date.now()}.txt`;
+  a.click();
+  showToast('💾 Pack downloaded!');
+}
+
+function downloadAll() {
+  downloadPNG();
+  setTimeout(downloadTxt, 500);
+}
+
+function copyAllContent() {
+  const ids = ['mj-main','mj-var','dalle-p','sd-p','rb-title','rb-desc','rb-tags','rb-price','seo-pin','seo-ig','seo-niche'];
+  let text = '';
+  ids.forEach(id => text += '\n' + (document.getElementById(id)?.textContent||'') + '\n');
+  navigator.clipboard.writeText(text).then(() => showToast('📋 All copied!'));
+}
+
+// ══════════════════════════════════
+// HELPERS
+// ══════════════════════════════════
+function cp(id, btn) {
+  const t = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(t).then(() => {
+    if (btn) { btn.textContent='✅'; btn.classList.add('ok'); setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},2000); }
+    showToast('📋 Copied!');
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    showToast('📋 Copied!');
+  });
+}
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+function showOverlay(msg){
+  document.getElementById('loverlay').classList.add('on');
+  document.getElementById('lstep').textContent=msg;
+}
+function updateOverlay(msg){document.getElementById('lstep').textContent=msg}
+function hideOverlay(){document.getElementById('loverlay').classList.remove('on')}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+</script>
+</body>
+</html>
